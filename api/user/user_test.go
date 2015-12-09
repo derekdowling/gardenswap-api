@@ -12,5 +12,12 @@ func TestUser(t *testing.T) {
 		user, err := New()
 		So(err, ShouldBeNil)
 		So(user, ShouldNotBeNil)
+
+		Convey("->SetPassword()", func() {
+			err := user.SetPassword("foo")
+			So(err, ShouldBeNil)
+			So(user.Password, ShouldBeEmpty)
+			So(user.PasswordHash, ShouldNotBeEmpty)
+		})
 	})
 }

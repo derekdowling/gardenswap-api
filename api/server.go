@@ -8,6 +8,11 @@ import (
 	"github.com/rs/cors"
 )
 
+// API holds state for the server
+type API struct {
+	Logger *logrus.Logger
+}
+
 // BuildServer creates a new HTTP Server
 func BuildServer() *negroni.Negroni {
 
@@ -39,7 +44,7 @@ func configureLogging(api *API) {
 func buildRouter(api *API) *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/users", api.Register).Methods("POST").Name("register")
-	router.HandleFunc("/users", api.GetUsers).Methods("GET")
+	router.HandleFunc("/users", api.ListUsers).Methods("GET")
 
 	return router
 }

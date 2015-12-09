@@ -1,14 +1,14 @@
 package api
 
 import (
-	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
-	"github.com/derekdowling/gardenswap-api/db"
-	"github.com/derekdowling/gardenswap-api/user"
+	"github.com/derekdowling/gardenswap-api/api/user"
+
+	"github.com/derekdowling/go-json-spec-handler"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -25,14 +25,15 @@ func TestUserHandler(t *testing.T) {
 		testUser, err := buildTestUser()
 		So(err, ShouldBeNil)
 
-		Convey("->parseJSONUser()", func() {
+		Convey("->parseUser()", func() {
 			jsonUser, err := testUserJSON(testUser)
 			So(err, ShouldBeNil)
 			req := testRequest(jsonUser)
 
-			user, parseErr := parseJSONUser(req.Body)
+			user, parseErr := parseUser(req)
 			So(parseErr, ShouldBeNil)
 			So(user, ShouldNotBeNil)
+			So(user.ID, ShouldEqual, testUser.ID)
 		})
 
 		Convey("->createUser()", func() {
@@ -44,20 +45,22 @@ func TestUserHandler(t *testing.T) {
 			So(user.ID, ShouldNotBeNil)
 			So(user.JWT, ShouldNotBeNil)
 
-			db, err := db.GetDB()
-			So(db.NewRecord(user), ShouldBeFalse)
+			savedUser, err := GetUser(user.ID)
+			So(err, ShouldBeNil)
+			So(savedUser, ShouldResemble, user)
 		})
 
 		Convey("POST /user", func() {
 
 			Convey("should return a formatted output page", func() {
-				usersURL := combineURL(baseURL, "/users")
+
+				user, err := buildTestUser()
 				So(err, ShouldBeNil)
 
-				jsonStr, err := testUserJSON(testUser)
+				req, err := getUserRequest("GET", baseURL, user)
 				So(err, ShouldBeNil)
 
-				resp, err := testResponse(usersURL, "POST", jsonStr)
+				resp, err := testRequest(req)
 				So(err, ShouldBeNil)
 				So(resp, ShouldNotBeNil)
 				So(resp.StatusCode, ShouldEqual, 201)
@@ -71,25 +74,33 @@ func TestUserHandler(t *testing.T) {
 				So(respUser.JWT, ShouldNotBeEmpty)
 			})
 		})
+
+		Convey("GET /users", func() {
+
+		})
 	})
 }
 
-func testResponse(url string, method string, json []byte) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(json))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", jSONType)
+func testRequest(req *http.Request) (*http.Response, error) {
 	req.Header.Set("Origin", "http://localhost")
-
 	client := &http.Client{}
 	return client.Do(req)
 }
 
-func testUserJSON(user *user.User) ([]byte, error) {
-	return json.Marshal(&JSONObject{
-		Data: userToData(user),
-	})
+func getUserRequest(method string, baseURL string, user *user.User) (*http.Request, error) {
+	obj, err := jsh.NewObject(user.ID, "user", user)
+	if err != nil {
+		return nil, err
+	}
+
+	url := &url.URL{Host: baseURL}
+
+	req, reqErr := jsh.NewObjectRequest(method, url, obj)
+	if reqErr != nil {
+		return nil, reqErr
+	}
+
+	return req, nil
 }
 
 func buildTestUser() (*user.User, error) {

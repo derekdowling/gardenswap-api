@@ -2,13 +2,15 @@ package user
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"io/ioutil"
 	"path"
 	"runtime"
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/derekdowling/gardenswap-api/db"
+	"github.com/derekdowling/gardenswap-api/api/db"
+	"github.com/derekdowling/gardenswap-api/api/password"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/nu7hatch/gouuid"
@@ -47,23 +49,16 @@ func init() {
 	if err != nil {
 		log.Print(err)
 	}
-
-	db, err := db.Get()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	db.CreateTable(&User{})
 }
 
 // User JSONAPISpec representation
 type User struct {
-	ID           string `json:"id" valid:"uuidv4,required"`
-	Name         string `json:"name" valid:"alpha,required"`
-	Email        string `json:"email" valid:"email"`
-	JWT          string `json:"jwt" valid:"alphanum,required"`
-	PasswordHash string `json:"password_hash"`
-	Password     string `json:",omitempty"`
+	ID           string `json:"id" valid:"uuidv4,required" db:"id"`
+	Name         string `json:"name" valid:"alpha,required" db:"name"`
+	Email        string `json:"email" valid:"email" db:"email"`
+	JWT          string `json:"jwt" valid:"alphanum,required" db:"jwt"`
+	PasswordHash string `json:"-" db:"password_hash"`
+	Password     string `json:"password,omitempty"`
 }
 
 // New creates a new object with a UUID and type
@@ -95,19 +90,58 @@ func (u *User) RotateJWT() error {
 	return nil
 }
 
-// Save persists the most recent user model to the database
-func (u *User) Save() error {
-
-	db, err := GetDB()
+// SetPassword prepares a new encrypted password for being saved in the
+// database
+func (u *User) SetPassword(pass string) error {
+	password, err := password.Encrypt(pass)
 	if err != nil {
 		return err
 	}
 
-	if db.NewRecord(u) {
-		db.Create(u)
-	} else {
-		db.Save(u)
-	}
+	u.PasswordHash = password
+	u.Password = ""
+	return nil
+}
+
+// Save persists the most recent user model to the database
+func (u *User) Save(isNew bool) error {
+
+	// var query string
+
+	// if isNew {
+	// } else {
+	// db.Save(u)
+	// }
+
+	// result, err := GetDB().Exec(query)
+	// if err != nil {
+	// return fmt.Errorf("Error saving user: %s", err.Error)
+	// }
 
 	return nil
+}
+
+// Get attempts to find a single user based on ID
+func Get(id string) (*User, error) {
+	user := &User{}
+	err := db.Get().Get(&user, "SELECT * FROM users WHERE id=$1", id)
+	if err != nil {
+		return nil, fmt.Errorf(
+			"Error attempting to fetch user by id: %s", err.Error(),
+		)
+	}
+
+	return user, nil
+}
+
+// All returns a list of all users
+func All() ([]*User, error) {
+
+	users := []*User{}
+	err := db.Get().Select(&users, "SELECT * FROM users")
+	if err != nil {
+		return nil, fmt.Errorf("Error retrieving users: %s", err.Error())
+	}
+
+	return users, nil
 }
