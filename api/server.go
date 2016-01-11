@@ -1,50 +1,32 @@
 package api
 
 import (
-	"github.com/Sirupsen/logrus"
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/mux"
-	"github.com/meatballhat/negroni-logrus"
+	"log"
+	"os"
+
+	"github.com/derekdowling/jsh-api"
 	"github.com/rs/cors"
+	"github.com/zenazn/goji/web"
 )
 
-// API holds state for the server
-type API struct {
-	Logger *logrus.Logger
-}
-
 // BuildServer creates a new HTTP Server
-func BuildServer() *negroni.Negroni {
+func BuildServer() *web.Mux {
 
-	api := &API{}
-	configureLogging(api)
-
-	corsHandler := cors.New(cors.Options{
+	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost*"},
 		AllowedHeaders: []string{"*"},
 		AllowedMethods: []string{"POST", "PATCH", "GET"},
 		Debug:          true,
 	})
 
-	server := negroni.New()
-	server.Use(negronilogrus.NewMiddlewareFromLogger(api.Logger, "router"))
-	server.Use(corsHandler)
+	api := jshapi.New("")
+	jshapi.Logger = log.New(os.Stdout, "api", log.Ldate|log.Ltime)
+	api.Use(c.Handler)
 
-	router := buildRouter(api)
-	server.UseHandler(router)
+	userStorage := &UserStorage{}
+	users := jshapi.NewCRUDResource("users", userStorage)
 
-	return server
-}
+	api.Add(users)
 
-func configureLogging(api *API) {
-	api.Logger = logrus.New()
-	api.Logger.Formatter = &logrus.JSONFormatter{}
-}
-
-func buildRouter(api *API) *mux.Router {
-	router := mux.NewRouter()
-	router.HandleFunc("/users", api.Register).Methods("POST").Name("register")
-	router.HandleFunc("/users", api.ListUsers).Methods("GET")
-
-	return router
+	return api
 }

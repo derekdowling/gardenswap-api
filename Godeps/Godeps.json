@@ -20,27 +20,28 @@
 			"Rev": "edd46cdac249b001c7b7d88c6d43993ea875e8d8"
 		},
 		{
-			"ImportPath": "github.com/codegangsta/negroni",
-			"Comment": "v0.1-70-gc7477ad",
-			"Rev": "c7477ad8e330bef55bf1ebe300cf8aa67c492d1b"
+			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
+			"Comment": "0.7.5",
+			"Rev": "e3c1cc5cc7e6dde1ee9eadfdda0e234dd0ad7216"
 		},
 		{
-			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.5.4",
-			"Rev": "19686b8b9bd5939783e2f4a168719a5e017de100"
+			"ImportPath": "github.com/derekdowling/go-stdlogger",
+			"Rev": "cfa80b78b82f8d241ceece0b733b1161bb6a885c"
+		},
+		{
+			"ImportPath": "github.com/derekdowling/goji2-logger",
+			"Comment": "0.1-7-gad5b694",
+			"Rev": "ad5b6943fe2fd4c97356f8ec627207c5fcb5ec85"
+		},
+		{
+			"ImportPath": "github.com/derekdowling/jsh-api",
+			"Comment": "0.4.2-2-g2cb2005",
+			"Rev": "2cb200569560a08754de776023fdd0adffb35cdf"
 		},
 		{
 			"ImportPath": "github.com/dgrijalva/jwt-go",
 			"Comment": "v2.4.0",
 			"Rev": "f164e17f59b82642a3895ba065c385db6c547344"
-		},
-		{
-			"ImportPath": "github.com/gorilla/context",
-			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
-		},
-		{
-			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "9cb89f07ca03c6a28d1e237ba033bc6a29422fd6"
 		},
 		{
 			"ImportPath": "github.com/jmoiron/sqlx",
@@ -65,10 +66,6 @@
 			"Rev": "b808f01f660667b1510acf216aa2b9fe7f555ddb"
 		},
 		{
-			"ImportPath": "github.com/meatballhat/negroni-logrus",
-			"Rev": "dd89490b0057cca7fe3fa3885f82935dfd430c2e"
-		},
-		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
 			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
 		},
@@ -87,12 +84,25 @@
 			"Rev": "ab7641a0db76b0e88765294b1377b026ec01f26b"
 		},
 		{
+			"ImportPath": "github.com/zenazn/goji/web",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "goji.io",
+			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
 			"Rev": "c8b9e6388ef638d5a8a9d865c634befdc46a6784"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/blowfish",
 			"Rev": "c8b9e6388ef638d5a8a9d865c634befdc46a6784"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "28273ec927bee3bea305f112fc28ceee575ea893"
 		}
 	]
 }
