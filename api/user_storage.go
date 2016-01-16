@@ -19,9 +19,55 @@ type UserAPI struct {
 	Logger std.Logger
 }
 
+// List returns a list of all users
+func (u *UserAPI) List(ctx context.Context) (jsh.List, jsh.ErrorType) {
+	users, err := user.All()
+	if err != nil {
+		return nil, jsh.ISE(err.Error())
+	}
+
+	list := jsh.List{}
+
+	for _, user := range users {
+		obj, err := jsh.NewObject(user.ID, "users", user)
+		if err != nil {
+			return nil, jsh.ISE(fmt.Sprintf("Error converting user to response object: %s", err.Error()))
+		}
+		list = append(list, obj)
+	}
+
+	return list, nil
+}
+
+// Save persistes a User object
+func (u *UserAPI) Save(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.ErrorType) {
+	return object, nil
+}
+
+// Get retrieves a user by ID
+func (u *UserAPI) Get(ctx context.Context, id string) (*jsh.Object, jsh.ErrorType) {
+	user := &user.User{}
+
+	object, err := jsh.NewObject(id, "user", user)
+	if err != nil {
+		return nil, err
+	}
+
+	return object, nil
+}
+
+// Update modifies an existing user
+func (u *UserAPI) Update(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.ErrorType) {
+	return object, nil
+}
+
+// Delete removes a user by ID
+func (u *UserAPI) Delete(ctx context.Context, id string) jsh.ErrorType {
+	return nil
+}
+
 // Register handles persisting a new user and their relevant identifiers
-// TODO: convert this to mutate type
-func (u *UserAPI) Register(w http.ResponseWriter, r *http.Request) {
+func (u *UserAPI) Register(ctx context.Context, w http.ResponseWriter, r *http.Request) {
 
 	user, err := parseUser(r)
 	if err != nil {
@@ -46,42 +92,6 @@ func (u *UserAPI) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsh.Send(w, r, obj)
-}
-
-// List returns a list of all users
-func (u *UserAPI) List(ctx context.Context) (jsh.List, jsh.ErrorType) {
-	users, err := user.All()
-	if err != nil {
-		return nil, jsh.ISE(err.Error())
-	}
-
-	list := jsh.List{}
-
-	for _, user := range users {
-		obj, err := jsh.NewObject(user.ID, "users", user)
-		if err != nil {
-			return nil, jsh.ISE(fmt.Sprintf("Error converting user to response object: %s", err.Error()))
-		}
-		list = append(list, obj)
-	}
-
-	return list, nil
-}
-
-func parseUser(r *http.Request) (*user.User, jsh.SendableError) {
-
-	userObj, err := jsh.ParseObject(r)
-	if err != nil {
-		return nil, err
-	}
-
-	user := &user.User{ID: userObj.ID}
-	err = userObj.Unmarshal("user", user)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
 }
 
 // CreateUser converts an incoming JSON body into a User struct
@@ -112,4 +122,21 @@ func registerUser(usr *user.User) error {
 	}
 
 	return nil
+}
+
+// parseUser marshals a user from a JSONAPI request into our internal User
+// type
+func parseUser(r *http.Request) (*user.User, jsh.ErrorType) {
+	userObj, err := jsh.ParseObject(r)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &user.User{ID: userObj.ID}
+	unmarshalErr := userObj.Unmarshal("user", user)
+	if err != nil {
+		return nil, unmarshalErr
+	}
+
+	return user, nil
 }

@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/derekdowling/gardenswap-api",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.3",
 	"Packages": [
 		"./..."
 	],
@@ -30,8 +30,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/goji2-logger",
-			"Comment": "0.1-7-gad5b694",
-			"Rev": "ad5b6943fe2fd4c97356f8ec627207c5fcb5ec85"
+			"Comment": "0.2-1-g148764a",
+			"Rev": "148764a2aea6cdd93a6776e20da13f6dfa38775f"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/jsh-api",

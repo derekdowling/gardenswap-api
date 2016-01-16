@@ -4,29 +4,43 @@ import (
 	"log"
 	"os"
 
+	"goji.io/pat"
+
+	"github.com/derekdowling/go-stdlogger"
 	"github.com/derekdowling/jsh-api"
 	"github.com/rs/cors"
-	"github.com/zenazn/goji/web"
 )
 
 // BuildServer creates a new HTTP Server
-func BuildServer() *web.Mux {
+func BuildServer(debug bool) *jshapi.API {
 
-	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost*"},
-		AllowedHeaders: []string{"*"},
-		AllowedMethods: []string{"POST", "PATCH", "GET"},
-		Debug:          true,
-	})
+	// setup logging
+	logger := buildLogger()
+	jshapi.Logger = logger
 
-	api := jshapi.New("")
-	jshapi.Logger = log.New(os.Stdout, "api", log.Ldate|log.Ltime)
-	api.Use(c.Handler)
+	api := jshapi.New("", debug)
 
-	userStorage := &UserStorage{}
-	users := jshapi.NewCRUDResource("users", userStorage)
+	// set middleware
+	api.Use(buildCORS(debug).Handler)
 
+	// /users Routes
+	userAPI := &UserAPI{Logger: logger}
+	users := jshapi.NewCRUDResource("users", userAPI)
 	api.Add(users)
+	api.Mux.HandleFuncC(pat.Post("/register"), userAPI.Register)
 
 	return api
+}
+
+func buildCORS(debug bool) *cors.Cors {
+	return cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost*"},
+		AllowedHeaders: []string{"*"},
+		AllowedMethods: []string{"POST", "PATCH", "GET", "DELETE"},
+		Debug:          debug,
+	})
+}
+
+func buildLogger() std.Logger {
+	return log.New(os.Stderr, "gardenswap: ", log.LstdFlags)
 }
