@@ -35,8 +35,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/jsh-api",
-			"Comment": "0.4.2-2-g2cb2005",
-			"Rev": "2cb200569560a08754de776023fdd0adffb35cdf"
+			"Comment": "0.4.3",
+			"Rev": "ea83d210a98f4237f99d94fd94a2ca09b152b378"
 		},
 		{
 			"ImportPath": "github.com/dgrijalva/jwt-go",
