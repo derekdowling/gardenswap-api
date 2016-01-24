@@ -1,8 +1,16 @@
 package main
 
-import "github.com/derekdowling/gardenswap-api/api"
+import (
+	"log"
+	"net/http"
+
+	"github.com/derekdowling/gardenswap-api/api"
+)
 
 func main() {
-	server := api.BuildServer()
-	server.Run(":3000")
+	server := api.BuildServer(true)
+
+	address := "0.0.0.0:8080"
+	log.Printf("Server started, listening at %s", address)
+	log.Fatal(http.ListenAndServe(address, server.Mux))
 }

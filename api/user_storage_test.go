@@ -1,12 +1,11 @@
 package api
 
 import (
-	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
-	"github.com/derekdowling/gardenswap-api/api/user"
+	"github.com/derekdowling/gardenswap-api/gardenswap"
+	"github.com/derekdowling/go-json-spec-handler/client"
 
 	"github.com/derekdowling/go-json-spec-handler"
 	. "github.com/smartystreets/goconvey/convey"
@@ -22,32 +21,32 @@ func TestUserHandler(t *testing.T) {
 
 		baseURL := server.URL
 
-		testUser, err := buildTestUser()
+		user, err := testUser()
 		So(err, ShouldBeNil)
 
 		Convey("->parseUser()", func() {
-			jsonUser, err := testUserJSON(testUser)
+			jsonUser, err := testJSONUser()
 			So(err, ShouldBeNil)
 
-			req, err := testRequest(jsonUser)
+			req, err := jsc.PostRequest(baseURL, jsonUser)
 			So(err, ShouldBeNil)
 
 			user, parseErr := parseUser(req)
 			So(parseErr, ShouldBeNil)
 			So(user, ShouldNotBeNil)
-			So(user.ID, ShouldEqual, testUser.ID)
+			So(user.ID, ShouldEqual, user.ID)
 		})
 
-		Convey("->createUser()", func() {
-			user, err := buildTestUser()
+		Convey("->registerUser()", func() {
+			user, err = testUser()
 			So(err, ShouldBeNil)
 
-			err = createUser(user)
+			err = registerUser(user)
 			So(err, ShouldBeNil)
 			So(user.ID, ShouldNotBeNil)
 			So(user.JWT, ShouldNotBeNil)
 
-			savedUser, err := GetUser(user.ID)
+			savedUser, err := gardenswap.FetchUser(user.ID)
 			So(err, ShouldBeNil)
 			So(savedUser, ShouldResemble, user)
 		})
@@ -56,24 +55,14 @@ func TestUserHandler(t *testing.T) {
 
 			Convey("should return a formatted output page", func() {
 
-				user, err := buildTestUser()
+				jsonUser, err := testJSONUser()
 				So(err, ShouldBeNil)
 
-				req, err := getUserRequest("GET", baseURL, user)
-				So(err, ShouldBeNil)
-
-				resp, err := testRequest(req)
+				doc, resp, err := jsc.Post(baseURL, jsonUser)
 				So(err, ShouldBeNil)
 				So(resp, ShouldNotBeNil)
 				So(resp.StatusCode, ShouldEqual, 201)
-
-				// Decode profile and deep compare structs
-				respUser, parseErr := parseJSONUser(resp.Body)
-				So(parseErr, ShouldBeNil)
-				So(respUser.ID, ShouldEqual, testUser.ID)
-				So(respUser.Password, ShouldBeEmpty)
-				So(respUser.PasswordHash, ShouldBeEmpty)
-				So(respUser.JWT, ShouldNotBeEmpty)
+				So(doc, ShouldNotBeNil)
 			})
 		})
 
@@ -83,30 +72,8 @@ func TestUserHandler(t *testing.T) {
 	})
 }
 
-func testRequest(req *http.Request) (*http.Response, error) {
-	req.Header.Set("Origin", "http://localhost")
-	client := &http.Client{}
-	return client.Do(req)
-}
-
-func getUserRequest(method string, baseURL string, user *user.User) (*http.Request, error) {
-	obj, err := jsh.NewObject(user.ID, "user", user)
-	if err != nil {
-		return nil, err
-	}
-
-	url := &url.URL{Host: baseURL}
-
-	req, reqErr := jsh.NewObjectRequest(method, url, obj)
-	if reqErr != nil {
-		return nil, reqErr
-	}
-
-	return req, nil
-}
-
-func buildTestUser() (*user.User, error) {
-	user, err := user.New()
+func testUser() (*gardenswap.User, error) {
+	user, err := gardenswap.NewUser()
 	if err != nil {
 		return nil, err
 	}
@@ -115,4 +82,13 @@ func buildTestUser() (*user.User, error) {
 	user.Name = "Derek"
 	user.Password = "test456"
 	return user, nil
+}
+
+func testJSONUser() (*jsh.Object, error) {
+	testUser, err := testUser()
+	if err != nil {
+		return nil, err
+	}
+
+	return jsh.NewObject(testUser.ID, UserType, testUser)
 }

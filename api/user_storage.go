@@ -7,12 +7,15 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/derekdowling/gardenswap-api/api/db"
-	"github.com/derekdowling/gardenswap-api/api/user"
+	"github.com/derekdowling/gardenswap-api/gardenswap"
 	"github.com/derekdowling/go-stdlogger"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/derekdowling/go-json-spec-handler"
 )
+
+// UserType defines the type label for JSON API
+const UserType = "users"
 
 // UserAPI implements the jsh-api CRUD interface
 type UserAPI struct {
@@ -21,7 +24,7 @@ type UserAPI struct {
 
 // List returns a list of all users
 func (u *UserAPI) List(ctx context.Context) (jsh.List, jsh.ErrorType) {
-	users, err := user.All()
+	users, err := gardenswap.ListUsers()
 	if err != nil {
 		return nil, jsh.ISE(err.Error())
 	}
@@ -29,7 +32,7 @@ func (u *UserAPI) List(ctx context.Context) (jsh.List, jsh.ErrorType) {
 	list := jsh.List{}
 
 	for _, user := range users {
-		obj, err := jsh.NewObject(user.ID, "users", user)
+		obj, err := jsh.NewObject(user.ID, UserType, user)
 		if err != nil {
 			return nil, jsh.ISE(fmt.Sprintf("Error converting user to response object: %s", err.Error()))
 		}
@@ -46,9 +49,9 @@ func (u *UserAPI) Save(ctx context.Context, object *jsh.Object) (*jsh.Object, js
 
 // Get retrieves a user by ID
 func (u *UserAPI) Get(ctx context.Context, id string) (*jsh.Object, jsh.ErrorType) {
-	user := &user.User{}
+	user := &gardenswap.User{}
 
-	object, err := jsh.NewObject(id, "user", user)
+	object, err := jsh.NewObject(id, UserType, user)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +87,7 @@ func (u *UserAPI) Register(ctx context.Context, w http.ResponseWriter, r *http.R
 		return
 	}
 
-	obj, err := jsh.NewObject(user.ID, "user", user)
+	obj, err := jsh.NewObject(user.ID, UserType, user)
 	if err != nil {
 		u.Logger.Printf("Error creating user response: %s", err.Error())
 		jsh.Send(w, r, err)
@@ -95,7 +98,7 @@ func (u *UserAPI) Register(ctx context.Context, w http.ResponseWriter, r *http.R
 }
 
 // CreateUser converts an incoming JSON body into a User struct
-func registerUser(usr *user.User) error {
+func registerUser(usr *gardenswap.User) error {
 
 	err := usr.SetPassword(usr.Password)
 	if err != nil {
@@ -107,7 +110,7 @@ func registerUser(usr *user.User) error {
 		return err
 	}
 
-	query, _, err := sq.Insert("users").
+	query, _, err := sq.Insert(UserType).
 		Columns("id", "name", "email", "jwt", "password").
 		Values(usr.ID, usr.Name, usr.Email, usr.JWT, usr.PasswordHash).
 		ToSql()
@@ -126,14 +129,14 @@ func registerUser(usr *user.User) error {
 
 // parseUser marshals a user from a JSONAPI request into our internal User
 // type
-func parseUser(r *http.Request) (*user.User, jsh.ErrorType) {
+func parseUser(r *http.Request) (*gardenswap.User, jsh.ErrorType) {
 	userObj, err := jsh.ParseObject(r)
 	if err != nil {
 		return nil, err
 	}
 
-	user := &user.User{ID: userObj.ID}
-	unmarshalErr := userObj.Unmarshal("user", user)
+	user := &gardenswap.User{ID: userObj.ID}
+	unmarshalErr := userObj.Unmarshal(UserType, user)
 	if err != nil {
 		return nil, unmarshalErr
 	}
