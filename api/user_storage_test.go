@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http/httptest"
 	"testing"
 
@@ -29,9 +30,11 @@ func TestUserHandler(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			req, err := jsc.PostRequest(baseURL, jsonUser)
+			log.Printf("reqErr = %+v\n", err)
 			So(err, ShouldBeNil)
 
 			user, parseErr := parseUser(req)
+			log.Printf("parseErr = %+v\n", parseErr)
 			So(parseErr, ShouldBeNil)
 			So(user, ShouldNotBeNil)
 			So(user.ID, ShouldEqual, user.ID)

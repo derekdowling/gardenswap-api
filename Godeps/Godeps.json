@@ -21,8 +21,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.7.8",
-			"Rev": "bfb5a94e017d6f9837ee6d778a40e47163e21512"
+			"Comment": "0.7.8-1-g400a3d4",
+			"Rev": "400a3d4037cdf5db2342b39d777442816df24fdc"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-stdlogger",

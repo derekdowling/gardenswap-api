@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"golang.org/x/net/context"
@@ -132,12 +133,14 @@ func registerUser(usr *gardenswap.User) error {
 func parseUser(r *http.Request) (*gardenswap.User, jsh.ErrorType) {
 	userObj, err := jsh.ParseObject(r)
 	if err != nil {
+		log.Printf("err = %+v\n", err)
 		return nil, err
 	}
 
 	user := &gardenswap.User{ID: userObj.ID}
 	unmarshalErr := userObj.Unmarshal(UserType, user)
-	if err != nil {
+	if unmarshalErr != nil {
+		log.Printf("uerr = %+v\n", unmarshalErr)
 		return nil, unmarshalErr
 	}
 

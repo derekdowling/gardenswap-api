@@ -20,8 +20,8 @@ const (
 	tokenExpirationHours = 72
 )
 
-const privKeyPath string = "./keys/app.rsa"
-const pubKeyPath string = "./keys/app.rsa.pub"
+const privKeyPath string = "../keys/app.rsa"
+const pubKeyPath string = "../keys/app.rsa.pub"
 
 var signKey *rsa.PrivateKey
 var verifyKey *rsa.PublicKey
