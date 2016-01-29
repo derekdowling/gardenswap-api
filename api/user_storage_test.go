@@ -1,7 +1,6 @@
 package api
 
 import (
-	"log"
 	"net/http/httptest"
 	"testing"
 
@@ -29,15 +28,15 @@ func TestUserHandler(t *testing.T) {
 			jsonUser, err := testJSONUser()
 			So(err, ShouldBeNil)
 
-			req, err := jsc.PostRequest(baseURL, jsonUser)
-			log.Printf("reqErr = %+v\n", err)
-			So(err, ShouldBeNil)
+			Convey("should parse a valid User", func() {
+				req, err := jsc.PostRequest(baseURL, jsonUser)
+				So(err, ShouldBeNil)
 
-			user, parseErr := parseUser(req)
-			log.Printf("parseErr = %+v\n", parseErr)
-			So(parseErr, ShouldBeNil)
-			So(user, ShouldNotBeNil)
-			So(user.ID, ShouldEqual, user.ID)
+				user, parseErr := parseUser(req)
+				So(parseErr, ShouldBeNil)
+				So(user, ShouldNotBeNil)
+				So(user.ID, ShouldEqual, user.ID)
+			})
 		})
 
 		Convey("->registerUser()", func() {
@@ -81,7 +80,7 @@ func testUser() (*gardenswap.User, error) {
 		return nil, err
 	}
 
-	user.Email = "test123"
+	user.Email = "test123@gmail.com"
 	user.Name = "Derek"
 	user.Password = "test456"
 	return user, nil

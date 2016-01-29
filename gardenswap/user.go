@@ -53,10 +53,10 @@ func init() {
 
 // User JSONAPISpec representation
 type User struct {
-	ID           string `json:"id" valid:"uuidv4,required" db:"id"`
+	ID           string `json:"id" valid:"required" db:"id"`
 	Name         string `json:"name" valid:"alpha,required" db:"name"`
-	Email        string `json:"email" valid:"email" db:"email"`
-	JWT          string `json:"jwt" valid:"alphanum,required" db:"jwt"`
+	Email        string `json:"email" valid:"email,required" db:"email"`
+	JWT          string `json:"jwt" valid:"alphanum" db:"jwt"`
 	PasswordHash string `json:"-" db:"password_hash"`
 	Password     string `json:"password,omitempty"`
 }
