@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/derekdowling/gardenswap-api",
-	"GoVersion": "go1.5.3",
+	"GoVersion": "go1.5",
 	"Packages": [
 		"./..."
 	],
@@ -21,8 +21,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.7.8-1-g400a3d4",
-			"Rev": "400a3d4037cdf5db2342b39d777442816df24fdc"
+			"Comment": "0.7.8-3-g8bdb74d",
+			"Rev": "8bdb74d86bd48ef8350d155dac63d6981cf108ac"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-stdlogger",
@@ -62,8 +62,8 @@
 		},
 		{
 			"ImportPath": "github.com/mattn/go-sqlite3",
-			"Comment": "v1.1.0-11-gb808f01",
-			"Rev": "b808f01f660667b1510acf216aa2b9fe7f555ddb"
+			"Comment": "v1.1.0-32-gf33c976",
+			"Rev": "f33c9767fbdd0d10fab2b7bf056e80bdf30c8ed1"
 		},
 		{
 			"ImportPath": "github.com/nu7hatch/gouuid",
@@ -84,13 +84,13 @@
 			"Rev": "ab7641a0db76b0e88765294b1377b026ec01f26b"
 		},
 		{
-			"ImportPath": "github.com/zenazn/goji/web",
+			"ImportPath": "github.com/zenazn/goji/web/mutil",
 			"Comment": "v0.9.0-34-gbf843a1",
 			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
 		},
 		{
 			"ImportPath": "goji.io",
-			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+			"Rev": "8110ccbc05240c40d43ccb004e0542b3bcbf27da"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
@@ -102,7 +102,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "28273ec927bee3bea305f112fc28ceee575ea893"
+			"Rev": "04b9de9b512f58addf28c9853d50ebef61c3953e"
 		}
 	]
 }
